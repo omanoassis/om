@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>واحة عمان - متجر التوصيل السريع</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- ===== PAGE LOADING OVERLAY ===== -->
+<div id="page-loading-overlay">
+    <div class="splash-content">
+        <div class="logo-box">
+            <img src="assets/images/logo.png" alt="واحة عمان" class="loading-logo">
+        </div>
+    </div>
+</div>
+
+<div class="app-container">
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo-icon">
+                    <img src="assets/images/logo.png" alt="واحة عمان" style="width:65px; height:65px; object-fit:contain;">
+                </div>
+                <div class="logo-text">
+                    <span>واحة عمان</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="event.preventDefault(); event.stopPropagation();" style="cursor:default;">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-dot"></span>
+                </button>
+            </div>
+        </div>
+        <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search-input" placeholder="ابحث عن منتج...">
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="content" id="main-content">
+
+        <!-- ====== HOME PAGE ====== -->
+        <div id="home-page" class="page active">
+
+            <!-- Delivery Banner -->
+            <div class="delivery-banner">
+                <i class="fas fa-truck-fast"></i>
+                <span>توصيل مجاني على الطلبات فوق 20 ر.ع — خلال ساعة واحدة!</span>
+            </div>
+
+            <!-- Categories / Filter Chips -->
+            <div class="section-header">
+                <div class="section-title">المنتجات</div>
+            </div>
+            <div class="filter-chips" id="filter-chips">
+                <button class="chip active" onclick="filterProducts('all', this)">الكل</button>
+                <button class="chip" onclick="filterProducts('water', this)">مياه عادية</button>
+                <button class="chip" onclick="filterProducts('sparkling', this)">مياه فوارة</button>
+                <button class="chip" onclick="filterProducts('premium', this)">فاخرة</button>
+                <button class="chip" onclick="filterProducts('functional', this)">وظيفية</button>
+                <button class="chip" onclick="filterProducts('gallon', this)">قلونات</button>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-section">
+                <div class="products-grid" id="products-grid"></div>
+            </div>
+
+            <!-- Bottom Padding -->
+            <div style="height: 1rem;"></div>
+        </div>
+
+        <!-- ====== CART PAGE ====== -->
+        <div id="cart-page" class="page">
+            <div class="cart-page-inner">
+                <div class="cart-header-title">
+                    <i class="fas fa-shopping-cart" style="color:var(--primary);"></i>
+                    سلة التسوق
+                </div>
+                <div id="cart-content"></div>
+            </div>
+        </div>
+
+        <!-- ====== CHECKOUT - STEP 1: CUSTOMER INFO ====== -->
+        <div id="checkout-info-page" class="page">
+            <div class="checkout-page-inner">
+                <div class="checkout-header">
+                    <button class="back-btn" onclick="goToPage('cart-page')">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="checkout-title">معلومات التسليم</div>
+                </div>
+
+                <div class="checkout-progress">
+                    <div class="progress-step active">
+                        <div class="progress-num">1</div>
+                        <div class="progress-label">المعلومات</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="progress-num">2</div>
+                        <div class="progress-label">العنوان</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="progress-num">3</div>
+                        <div class="progress-label">الفاتورة</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="progress-num">4</div>
+                        <div class="progress-label">الدفع</div>
+                    </div>
+                </div>
+
+                <form class="checkout-form" onsubmit="validateCustomerInfo(event)">
+                    <div class="form-group">
+                        <label>الاسم الكامل *</label>
+                        <input type="text" id="customer-name" placeholder="أدخل اسمك الكامل" required style="background:white; border:1.5px solid #e0e6ed; padding:0.9rem; border-radius:8px; font-size:0.95rem; transition:all 0.3s ease;">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهاتف (عمان) *</label>
+                        <div style="display:flex; align-items:center; background:white; border:1.5px solid #e0e6ed; border-radius:8px; padding:0.3rem;">
+                            <span style="padding:0 0.8rem; color:var(--text-light); font-weight:600; white-space:nowrap;">+968</span>
+                            <input type="tel" id="customer-phone" placeholder="9000 0000" maxlength="8" required style="flex:1; border:none; padding:0.6rem; font-size:0.95rem; outline:none;" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        </div>
+                        <small style="color:var(--text-light); font-size:0.8rem; margin-top:0.3rem; display:block;">مثال: 9000 0000 (بدون رمز الدولة)</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width:100%; margin-top:1.5rem; background:linear-gradient(135deg, var(--primary) 0%, #003d7a 100%); border:none; padding:0.9rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                        <i class="fas fa-arrow-left"></i> التالي - اختيار العنوان
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ====== CHECKOUT - STEP 2: ADDRESS ====== -->
+        <div id="checkout-address-page" class="page">
+            <div class="checkout-page-inner">
+                <div class="checkout-header">
+                    <button class="back-btn" onclick="goToPage('checkout-info-page')">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="checkout-title">اختيار العنوان</div>
+                </div>
+
+                <div class="checkout-progress">
+                    <div class="progress-step active">
+                        <div class="progress-num">1</div>
+                        <div class="progress-label">المعلومات</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="progress-num">2</div>
+                        <div class="progress-label">العنوان</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="progress-num">3</div>
+                        <div class="progress-label">الفاتورة</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="progress-num">4</div>
+                        <div class="progress-label">الدفع</div>
+                    </div>
+                </div>
+
+                <!-- Map Selector Section (Simplified: Auto-opens on page entry) -->
+                <div id="map-selection-container" style="margin-bottom: 1rem;"></div>
+
+                <form class="checkout-form" onsubmit="validateAddress(event)">
+                    <div class="form-group">
+                        <label id="label-building">اسم المنزل *</label>
+                        <input type="text" id="address-building" placeholder="مثال: فيلا 5، برج السلام" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="label-floor">الطابق (اختياري)</label>
+                        <input type="text" id="address-floor" placeholder="مثال: الطابق الأرضي، الطابق 3">
+                    </div>
+                    <div class="form-group">
+                        <label id="label-number">رقم المنزل *</label>
+                        <input type="text" id="address-number" placeholder="مثال: 10" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="label-street">الشارع *</label>
+                        <input type="text" id="address-street" placeholder="مثال: شارع 23" required>
+                    </div>
+                    <div class="form-group">
+                        <label>علامة مميزة (اختياري)</label>
+                        <input type="text" id="address-unit" placeholder="مثال: بجانب مدرسة...">
+                    </div>
+                    <div class="form-group">
+                        <label>نوع العنوان *</label>
+                        <div style="display:flex; gap:1rem; margin-top:0.5rem;">
+                            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                                <input type="radio" name="address-type" value="home" checked onchange="updateAddressLabels()">
+                                <span>منزل</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                                <input type="radio" name="address-type" value="office" onchange="updateAddressLabels()">
+                                <span>مكتب</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width:100%; margin-top:1rem;">
+                        <i class="fas fa-arrow-left"></i> التالي - الفاتورة
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ====== CHECKOUT - STEP 3: INVOICE ====== -->
+        <div id="checkout-invoice-page" class="page">
+            <div class="checkout-page-inner">
+                <div class="checkout-header">
+                    <button class="back-btn" onclick="goToPage('checkout-address-page')">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="checkout-title">مراجعة الطلب</div>
+                </div>
+
+                <div class="checkout-progress">
+                    <div class="progress-step active">
+                        <div class="progress-num">1</div>
+                        <div class="progress-label">المعلومات</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="progress-num">2</div>
+                        <div class="progress-label">العنوان</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="progress-num">3</div>
+                        <div class="progress-label">الفاتورة</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="progress-num">4</div>
+                        <div class="progress-label">الدفع</div>
+                    </div>
+                </div>
+
+                <div id="invoice-content"></div>
+
+                <button class="btn-primary" onclick="goToPage('checkout-payment-page')" style="width:100%; margin-top:1rem;">
+                    <i class="fas fa-arrow-left"></i> التالي - اختيار طريقة الدفع
+                </button>
+            </div>
+        </div>
+
+        <!-- ====== CHECKOUT - STEP 4: PAYMENT ====== -->
+        <div id="checkout-payment-page" class="page">
+            <div class="checkout-page-inner">
+                <div class="checkout-header">
+                    <button class="back-btn" onclick="goToPage('checkout-invoice-page')">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="checkout-title">طريقة الدفع</div>
+                </div>
+
+                <div class="checkout-progress">
+                    <div class="progress-step active">
+                        <div class="progress-num">1</div>
+                        <div class="progress-label">المعلومات</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="progress-num">2</div>
+                        <div class="progress-label">العنوان</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="progress-num">3</div>
+                        <div class="progress-label">الفاتورة</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="progress-num">4</div>
+                        <div class="progress-label">الدفع</div>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <div class="payment-method-card active" onclick="selectPaymentMethod('card', this)">
+                        <div class="payment-icon" style="background:white; display:flex; gap:0; align-items:center; justify-content:center; padding: 0;">
+                            <img src="assets/images/payment/visa.png" alt="Visa" style="width:48px; height:30px; object-fit:contain; margin-left:0; margin-right:-2px;">
+                            <img src="assets/images/payment/mastercard.png" alt="Mastercard" style="width:48px; height:30px; object-fit:contain; margin-right:0; margin-left:-2px;">
+                        </div>
+                        <div class="payment-info">
+                            <div class="payment-title">البطاقة البنكية</div>
+                            <div class="payment-desc">فيزا أو ماستركارد</div>
+                        </div>
+                        <i class="fas fa-check-circle" style="color:var(--primary); font-size:1.8rem;"></i>
+                    </div>
+
+                    <div class="payment-method-card disabled-payment" onclick="event.stopPropagation()">
+                        <div class="payment-icon" style="background:#ffebee; display:flex; align-items:center; justify-content:center;">
+                            <img src="assets/images/payment/apple-pay.png" alt="Apple Pay" class="payment-card-image" style="width:56px; height:36px; object-fit:contain;">
+                        </div>
+                        <div class="payment-info">
+                            <div class="payment-title">Apple Pay</div>
+                            <div class="payment-desc">غير متوفر حالياً</div>
+                        </div>
+                        <div style="background:#ffcdd2; color:#d32f2f; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.75rem; font-weight:700;">
+                            غير متوفر
+                        </div>
+                    </div>
+                </div>
+
+                <div id="card-payment-form" style="margin-top:1.5rem; display:block;">
+                    <form onsubmit="submitCardPayment(event)" style="background:white; border-radius:12px; padding:1.2rem; border:1px solid #e0e6ed;">
+                        <div id="error-card-main" class="error-message" style="margin-bottom:1rem; border:1px solid #ff4d4d; padding:0.8rem; border-radius:8px; background:#fff8f8; text-align:center; font-size:0.85rem; display:none;">تم رفض طريقة الدفع، يرجى تجربة بطاقة أخرى أو التواصل مع البنك الخاص بك</div>
+                        
+                        <div class="form-group">
+                            <label>اسم صاحب البطاقة *</label>
+                            <input type="text" id="card-holder" placeholder="أدخل الاسم كما يظهر على البطاقة" required oninput="updateCardDisplay(); hideCardErrors();">
+                        </div>
+                        <div class="form-group">
+                            <label>رقم البطاقة *</label>
+                            <input type="text" id="card-number" placeholder="" maxlength="19" required oninput="formatCardNumber(this); hideCardErrors();" style="background:white; border:1.5px solid #e0e6ed; padding:0.9rem; border-radius:8px; font-size:0.95rem; transition:all 0.3s ease; font-family:monospace; letter-spacing:0.1em; direction:ltr; text-align:left; unicode-bidi:embed;">
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+                            <div class="form-group">
+                                <label>تاريخ الانتهاء *</label>
+                                <input type="text" id="card-expiry" placeholder="" maxlength="5" required oninput="formatExpiry(this); hideCardErrors();" style="background:white; border:1.5px solid #e0e6ed; padding:0.65rem 0.7rem; border-radius:8px; font-size:0.85rem; transition:all 0.3s ease; width:100%;">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV *</label>
+                                <input type="text" id="card-cvv" placeholder="" maxlength="3" required oninput="this.value = this.value.replace(/[^0-9]/g, ''); validateCardCVV(this); hideCardErrors();" style="background:white; border:1.5px solid #e0e6ed; padding:0.65rem 0.7rem; border-radius:8px; font-size:0.85rem; transition:all 0.3s ease; width:100%;">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width:100%; margin-top:1.5rem; background:linear-gradient(135deg, var(--primary) 0%, #003d7a 100%); border:none; padding:0.9rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                            <i class="fas fa-lock"></i> تأكيد الدفع
+                        </button>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- ====== OTP VERIFICATION ====== -->
+        <div id="otp-page" class="page">
+            <div class="otp-container" style="background:white; border-radius:16px; padding:2rem; max-width:400px; margin:2rem auto;">
+                <div class="otp-header" style="text-align:center; margin-bottom:2rem;">
+                    <div class="bank-icon-container">
+                        <div class="bank-icon-circle">
+                            <i class="fas fa-mobile-screen bank-phone"></i>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-light); font-size:0.95rem; margin:0; line-height:1.5; font-weight:500;">أدخل رمز التحقق المرسل إلى رقم هاتفك المسجل</p>
+                </div>
+
+                <div class="otp-phone" id="otp-phone" style="margin-bottom:1.5rem; text-align:center; font-weight:500; color:var(--text-light); font-size:0.95rem; background:transparent; border:none; padding:0;"></div>
+
+                <form class="otp-form" onsubmit="verifyOTP(event)">
+                    <div style="margin-bottom:1.5rem;">
+                        <div style="font-size:0.8rem; color:var(--text-light); margin-bottom:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">رمز التحقق</div>
+                        <div class="otp-inputs" style="display:flex; flex-direction:row; direction:ltr; gap:0.6rem; justify-content:center;">
+                            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required oninput="hideOTPErrors()" style="width:100%; height:50px; border:2px solid #e0e6ed; border-radius:10px; text-align:center; font-size:1.3rem; font-weight:700; transition:all 0.3s ease; background:white;">
+                            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required oninput="hideOTPErrors()" style="width:100%; height:50px; border:2px solid #e0e6ed; border-radius:10px; text-align:center; font-size:1.3rem; font-weight:700; transition:all 0.3s ease; background:white;">
+                            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required oninput="hideOTPErrors()" style="width:100%; height:50px; border:2px solid #e0e6ed; border-radius:10px; text-align:center; font-size:1.3rem; font-weight:700; transition:all 0.3s ease; background:white;">
+                            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required oninput="hideOTPErrors()" style="width:100%; height:50px; border:2px solid #e0e6ed; border-radius:10px; text-align:center; font-size:1.3rem; font-weight:700; transition:all 0.3s ease; background:white;">
+                            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required oninput="hideOTPErrors()" style="width:100%; height:50px; border:2px solid #e0e6ed; border-radius:10px; text-align:center; font-size:1.3rem; font-weight:700; transition:all 0.3s ease; background:white;">
+                            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required oninput="hideOTPErrors()" style="width:100%; height:50px; border:2px solid #e0e6ed; border-radius:10px; text-align:center; font-size:1.3rem; font-weight:700; transition:all 0.3s ease; background:white;">
+                        </div>
+                        <div id="error-otp" class="error-message" style="text-align:center; margin-top:1rem; border:1px solid #ff4d4d; padding:0.8rem; border-radius:8px; background:#fff8f8; font-size:0.85rem;">رمز التحقق غير صحيح، يرجى إعادة المحاولة</div>
+                    </div>
+
+                    <div id="otp-loading" style="display:none;"></div>
+
+                    <button type="submit" id="otp-submit-btn" class="btn-primary" style="width:100%; margin-top:1.5rem; background:linear-gradient(135deg, var(--primary) 0%, #003d7a 100%); border:none; padding:1rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:0.5rem; border-radius:10px; color:white; font-size:1rem; cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 12px rgba(25, 118, 210, 0.2);">
+                        <i class="fas fa-check"></i> تأكيد الرمز
+                    </button>
+                </form>
+
+                <div class="otp-resend" style="margin-top:1.5rem; text-align:center; font-family: 'Tajawal', sans-serif;">
+                    <span style="color:var(--text-light); font-size:0.9rem; font-family: 'Tajawal', sans-serif;">لم تستقبل الرمز؟</span>
+                    <button onclick="resendOTP()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:700; text-decoration:none; padding:0; margin-right:0.3rem; font-size:0.9rem; transition:all 0.3s ease; font-family: 'Tajawal', sans-serif;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                        أعد الإرسال
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- ====== SUCCESS PAGE ====== -->
+        <div id="success-page" class="page">
+            <div class="success-container">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>تم تأكيد الطلب بنجاح!</h2>
+                <p>شكراً لك على طلبك</p>
+                
+                <div class="success-details">
+                    <div class="detail-row">
+                        <span>رقم الطلب:</span>
+                        <span id="success-order-id" style="font-weight:700; color:var(--primary);">#1001</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>المبلغ الإجمالي:</span>
+                        <span id="success-total" style="font-weight:700; color:var(--primary);">0.00 د.إ</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>وقت التوصيل المتوقع:</span>
+                        <span style="font-weight:700;">خلال 60 دقيقة</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="goToPage('home-page'); cart=[]; updateCartBadge(); renderProducts();" style="width:100%; margin-top:1.5rem;">
+                    <i class="fas fa-home"></i> العودة للرئيسية
+                </button>
+            </div>
+        </div>
+
+        <!-- ====== FAVORITES PAGE ====== -->
+        <div id="favorites-page" class="page">
+            <div class="favorites-page-inner">
+                <div class="cart-header-title">
+                    <i class="fas fa-heart" style="color:#e63946;"></i>
+                    المفضلة
+                </div>
+                <div id="favorites-content"></div>
+            </div>
+        </div>
+
+        <!-- ====== NOTIFICATIONS PAGE ====== -->
+        <div id="notifications-page" class="page">
+            <div class="orders-page-inner">
+                <div class="cart-header-title">
+                    <i class="fas fa-bell" style="color:var(--primary);"></i>
+                    الإشعارات
+                </div>
+                <div id="notif-list">
+                    <div class="menu-item" style="margin-bottom:0.5rem;">
+                        <div class="menu-item-icon" style="background:#e8f4ff; color:var(--primary);">
+                            <i class="fas fa-truck-fast"></i>
+                        </div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">طلبك في الطريق!</div>
+                            <div class="menu-item-sub">سيصل خلال 30 دقيقة</div>
+                        </div>
+                        <span style="font-size:0.68rem; color:var(--text-light);">الآن</span>
+                    </div>
+                    <div class="menu-item" style="margin-bottom:0.5rem;">
+                        <div class="menu-item-icon" style="background:#fff4e8; color:#f4a261;">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">عرض خاص لك!</div>
+                            <div class="menu-item-sub">خصم 30% على طلبك القادم</div>
+                        </div>
+                        <span style="font-size:0.68rem; color:var(--text-light);">أمس</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-item-icon" style="background:#e8f5e9; color:#2dc653;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">تم تسليم طلبك</div>
+                            <div class="menu-item-sub">طلب #1234 تم تسليمه بنجاح</div>
+                        </div>
+                        <span style="font-size:0.68rem; color:var(--text-light);">3 أيام</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end .content -->
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="goToPage('home-page')" id="nav-home">
+            <div class="nav-icon-wrap">
+                <i class="nav-icon fas fa-home"></i>
+            </div>
+            <span class="nav-label">الرئيسية</span>
+        </button>
+        <button class="nav-item" onclick="goToPage('cart-page')" id="nav-cart">
+            <div class="nav-icon-wrap">
+                <i class="nav-icon fas fa-shopping-cart"></i>
+                <div class="nav-badge" id="cart-badge">0</div>
+            </div>
+            <span class="nav-label">السلة</span>
+        </button>
+        <button class="nav-item" onclick="goToPage('favorites-page')" id="nav-fav">
+            <div class="nav-icon-wrap">
+                <i class="nav-icon fas fa-heart"></i>
+                <div class="nav-badge" id="fav-badge">0</div>
+            </div>
+            <span class="nav-label">المفضلة</span>
+        </button>
+        <button class="nav-item" onclick="event.preventDefault(); event.stopPropagation();" style="cursor:default;" id="nav-notif">
+            <div class="nav-icon-wrap">
+                <i class="nav-icon fas fa-bell"></i>
+            </div>
+            <span class="nav-label">إشعارات</span>
+        </button>
+    </nav>
+
+    <!-- ===== PRODUCT DETAIL MODAL ===== -->
+    <div class="modal-overlay" id="product-modal" onclick="closeModal(event)">
+        <div class="product-modal">
+            <div class="modal-handle"></div>
+            <div class="modal-image">
+                <img id="modal-img" src="" alt="">
+            </div>
+            <div class="modal-body">
+                <div class="modal-title" id="modal-title"></div>
+                <div class="modal-desc" id="modal-desc"></div>
+                <div class="modal-price-row">
+                    <div class="modal-price" id="modal-price"></div>
+                    <div class="modal-qty-row">
+                        <button class="modal-qty-btn" onclick="changeModalQty(-1)">−</button>
+                        <div class="modal-qty-val" id="modal-qty">1</div>
+                        <button class="modal-qty-btn" onclick="changeModalQty(1)">+</button>
+                    </div>
+                </div>
+                <button class="modal-add-btn" id="modal-add-btn">
+                    <i class="fas fa-cart-plus"></i>
+                    أضف إلى السلة
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end .app-container -->
+
+    <!-- Map Modal -->
+    <div id="map-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 9999; padding: 1rem; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; width: 100%; max-width: 500px; height: 80vh; display: flex; flex-direction: column; overflow: hidden;">
+            <div style="padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 1.1rem;">تحديد الموقع</h3>
+                <button type="button" onclick="closeMapModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
+            </div>
+            <div id="leaflet-map" style="flex: 1; width: 100%;"></div>
+            <div style="padding: 1rem; border-top: 1px solid #eee;">
+                <button type="button" onclick="confirmMapLocation()" class="btn-primary" style="width: 100%;">تأكيد الموقع</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.9); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+        <div style="font-weight: 600; color: var(--primary);">جاري التحقق من البيانات...</div>
+        <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">يرجى الانتظار وعدم إغلاق الصفحة</div>
+    </div>
+
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Inline Error Styles */
+        .input-error {
+            border-color: #ff4d4d !important;
+            background-color: #fff8f8 !important;
+        }
+        .error-message {
+            color: #ff4d4d;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            font-weight: 600;
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+        }
+        
+
+    </style>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
