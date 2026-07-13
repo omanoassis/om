@@ -14,7 +14,7 @@ const products = [
     // --- مياه عادية ---
     {
         id: 1, name: 'واحة عمان 200 مل', category: 'water',
-        price: 0.250, desc: 'مياه معدنية طبيعية نقية بحجم صغير محمول',
+        price: 0.055, desc: 'مياه معدنية طبيعية نقية بحجم صغير محمول',
         badge: '', badgeClass: '',
         img: 'assets/images/products/oasis-200ml.png'
     },
